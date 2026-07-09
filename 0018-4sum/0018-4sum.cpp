@@ -2,30 +2,59 @@ class Solution {
 public:
     vector<vector<int>> fourSum(vector<int>& nums, int target) {
 
-        sort(nums.begin(), nums.end());
-
+        vector<vector<int>> ans;
         int n = nums.size();
-        set<vector<int>> st;
+        if (n < 4) return ans;
+
+        sort(nums.begin(), nums.end());
 
         for (int i = 0; i < n - 3; i++) {
 
+            if (i && nums[i] == nums[i - 1]) continue;
+
+            // Pruning
+            long long mn = 1LL * nums[i] + nums[i + 1] + nums[i + 2] + nums[i + 3];
+            if (mn > target) break;
+
+            long long mx = 1LL * nums[i] + nums[n - 1] + nums[n - 2] + nums[n - 3];
+            if (mx < target) continue;
+
             for (int j = i + 1; j < n - 2; j++) {
 
-                unordered_set<long long> seen;
+                if (j > i + 1 && nums[j] == nums[j - 1]) continue;
 
-                for (int k = j + 1; k < n; k++) {
+                long long mn2 = 1LL * nums[i] + nums[j] + nums[j + 1] + nums[j + 2];
+                if (mn2 > target) break;
 
-                    long long need = (long long)target - nums[i] - nums[j] - nums[k];
+                long long mx2 = 1LL * nums[i] + nums[j] + nums[n - 1] + nums[n - 2];
+                if (mx2 < target) continue;
 
-                    if (seen.count(need)) {
-                        st.insert({nums[i], nums[j], (int)need, nums[k]});
+                int l = j + 1;
+                int r = n - 1;
+
+                while (l < r) {
+
+                    long long sum = 1LL * nums[i] + nums[j] + nums[l] + nums[r];
+
+                    if (sum == target) {
+
+                        ans.push_back({nums[i], nums[j], nums[l], nums[r]});
+
+                        l++;
+                        r--;
+
+                        while (l < r && nums[l] == nums[l - 1]) l++;
+                        while (l < r && nums[r] == nums[r + 1]) r--;
+
                     }
-
-                    seen.insert(nums[k]);
+                    else if (sum < target)
+                        l++;
+                    else
+                        r--;
                 }
             }
         }
 
-        return vector<vector<int>>(st.begin(), st.end());
+        return ans;
     }
 };
